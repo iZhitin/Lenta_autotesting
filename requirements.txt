@@ -1,0 +1,5 @@
+pytest
+pytest-selenium
+termcolor
+allure
+allure-python-commons
