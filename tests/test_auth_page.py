@@ -26,8 +26,8 @@ from selenium.webdriver.common.by import By
 #     assert page.get_relative_link() == '/all_pets', 'Ошибка авторизации'
 
 
-from selenium import webdriver
-driver = webdriver.Chrome()
+# from selenium import webdriver
+# driver = webdriver.Chrome()
 
 import uuid
 from selenium.webdriver.support.ui import WebDriverWait
@@ -45,15 +45,16 @@ def test_main_page(selenium):
     # element = selenium.find_element(By.XPATH, '//*[text()="Мясо, птица, колбаса"]')
     # element.click()
     # selenium.scroll_to_element(element)
-    web_element = WebDriverWait(selenium, 20).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'a[href="/catalog/myaso-ptica-kolbasa/"]')))
-    # ПРОКРУТКА В JS работает отлично, что не скажешь о прокрутке Selenium
-    selenium.execute_script("return arguments[0].scrollIntoView(true);", web_element)
-    # СУКА НУЖНО БЫЛО ПРОСТО ПОДОЖДАТЬ/ тварь, все из-за того, что не было проскролено до элемента
-    time.sleep(5)
-    ActionChains(selenium).move_to_element(element).click().perform()
+    page.scroll_wait_and_click_on_element((By.CSS_SELECTOR, 'a[href="/catalog/myaso-ptica-kolbasa/"]'))
+
     # page.take_screenshot()
-    screenshot = 'screenshots/{0}.png'
-    a = driver.save_screenshot(screenshot.format(str(uuid.uuid4().hex)))
+    # screenshot = 'screenshots/{0}.png'
+    # a = driver.save_screenshot(screenshot.format(str(uuid.uuid4().hex)))
+    # screenshot = 'screenshots/{0}.png'
+    # selenium.screenshot_as_png
+    # selenium.get_screenshot_as_file('/screenshot/sdrfdsf.png')
+    # selenium.save_screenshot('screenshots/sdrfdsf.png')
+    page.take_screenshot()
     time.sleep(5)
     assert a is True
 
