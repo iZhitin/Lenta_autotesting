@@ -1,13 +1,29 @@
 # импортируем функционал применимый к любой странице
 from pages.base_page import BasePage
+# для удобной работы с локаторами импортируем метод By
+from selenium.webdriver.common.by import By
 
 
 class MainPage(BasePage):
     def __init__(self, driver, url='', timeout=10):
         if url is False:
-            url = "https://lenta.com/"
-        # super().__init__(self, driver, timeout, url)
+            self.url = "https://lenta.com/"
         super().__init__(driver, url, timeout)
 
-    def get_url(self, url):
-        self.driver.get(url)
+        # локаторы элементов страницы
+        self.go_to_catalog_from_ad = (By.XPATH,
+                         '//*[@href="https://lenta.com/catalog/?utm_source=lweb&utm_medium=banner&utm_campaign=up"]')
+        self.right_buttons = (By.XPATH, '//*[@class="swiper-slider-button-next"]')
+        self.selection = (By.XPATH,
+                          '//*[@src="https://lenta.servicecdn.ru/globalassets/slider-images/2022-06/1326x300__american-tourister_samsonite______.jpg"]')
+        self.meat_category = (By.CSS_SELECTOR, 'a[href="/catalog/myaso-ptica-kolbasa/"]')
+
+    # авторизация не катит, так как нужны смс из телефона
+    # авторизация и получение cookie
+    # ??? или лучше это в base_page
+    # def authorization(self, locator=''):
+    #     # работает только напрямую
+    #     self.driver.get("https://lenta.com/")
+    #     self.driver.find_element_by_css_selector('[href="/npl/authentication"]').click()
+
+

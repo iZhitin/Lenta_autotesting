@@ -39,13 +39,40 @@ def test_main_page(selenium):
     page = MainPage(selenium)
     # page.get_url("https://lenta.com/")
     page.get_url("https://lenta.com/")
-    selenium.find_element_by_xpath\
-        ('//*[@href="https://lenta.com/catalog/?utm_source=lweb&utm_medium=banner&utm_campaign=up"]').click()
-    element = selenium.find_element(By.CSS_SELECTOR, 'a[href="/catalog/myaso-ptica-kolbasa/"]')
-    # element = selenium.find_element(By.XPATH, '//*[text()="Мясо, птица, колбаса"]')
-    # element.click()
-    # selenium.scroll_to_element(element)
-    page.scroll_wait_and_click_on_element((By.CSS_SELECTOR, 'a[href="/catalog/myaso-ptica-kolbasa/"]'))
+    # page.scroll_wait_and_click_on_element(page.go_to_catalog_from_ad)
+    # page.scroll_wait_and_click_on_element(page.selection)
+    selenium.find_element_by_xpath('//*[text()="Согласен"]').click()
+    page.wait_and_click_on_one_of_elements(page.right_buttons, 0)
+    page.wait_and_click_on_one_of_elements(page.right_buttons, 0)
+    # page.scroll_wait_and_click_on_one_of_elements(page.right_buttons, 1)
+    # page.scroll_wait_and_click_on_one_of_elements(page.right_buttons, 2)
+    # a = page.wait_presence(page.selection)
+    # assert a is False
+
+    # page.scroll_wait_and_click_on_element(page.selection)
+
+
+
+    # page.scroll_wait_and_click_on_element(page.right_button)
+    # while True:
+    #     page.scroll_wait_and_click_on_element(page.right_button).click()
+    #     if page.scroll_wait_and_click_on_element(page.selection):
+    #         page.scroll_wait_and_click_on_element(page.selection).click()
+    #         break
+
+
+    # # selenium.find_element_by_css_selector('[href="/npl/authentication"]').click()
+    # time.sleep(3)
+    # selenium.find_element_by_xpath\
+    #     ('//*[@href="https://lenta.com/catalog/?utm_source=lweb&utm_medium=banner&utm_campaign=up"]').click()
+    # element = selenium.find_element(By.CSS_SELECTOR, 'a[href="/catalog/myaso-ptica-kolbasa/"]')
+    # # element = selenium.find_element(By.XPATH, '//*[text()="Мясо, птица, колбаса"]')
+    # # element.click()
+    # # selenium.scroll_to_element(element)
+
+
+
+    # page.scroll_wait_and_click_on_element((By.CSS_SELECTOR, 'a[href="/catalog/myaso-ptica-kolbasa/"]'))
 
     # page.take_screenshot()
     # screenshot = 'screenshots/{0}.png'
