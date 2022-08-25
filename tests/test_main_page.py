@@ -6,8 +6,6 @@
 
 # для визуального контроля
 import time
-# для работы с cookie
-import pickle
 
 # импортируем класс тестируемой страницы
 from pages.main_page import MainPage
@@ -19,21 +17,26 @@ from pages.main_page import MainPage
 def test_main_page(selenium):
     # создаем экземпляр класса тестируемой страницы
     page = MainPage(selenium)
+    # открываем главную страницу
+    selenium.get(page.url)
 
-    page.get_url(page.url)
+    # соглашение с cookie
+    page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+    # прокликивание стрелочки вправо на первом баннере
+    page.wait_and_click_on_one_of_elements(page.right_buttons, 0)
+    page.wait_and_click_on_one_of_elements(page.right_buttons, 0)
+    page.wait_and_click_on_one_of_elements(page.right_buttons, 0)
 
+    # клик на каталог из предложения в хэдере
+    page.wait_scroll_and_click_on_element(page.go_to_catalog_from_ad)
+
+    # идем обратно, НАДО ! реализовать функцию back
+    selenium.get(page.url)
 
     # клик на акционный блок
-    # page.scroll_wait_and_click_on_element(page.selection)
-    # клик на каталог из предложения в хэдере
-    page.scroll_wait_and_click_on_element(page.go_to_catalog_from_ad)
+    page.wait_scroll_and_click_on_element(page.selection_board)
     # как работает переключение между окнами
-    # selenium.switch_to.window(selenium.window_handles[0])
-    # клик на категорию мясо, птица, колбаса
-    page.scroll_wait_and_click_on_element(page.meat_category)
-
-#     with open("my_cookies.txt", "wb") as cookies:
-# #         pickle.dump(selenium.get_cookies(), cookies)
-
-
-
+    selenium.switch_to.window(selenium.window_handles[0])
+    # скриншот
+    page.take_screenshot()
+    time.sleep(5)

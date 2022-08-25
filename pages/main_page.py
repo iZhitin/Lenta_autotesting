@@ -4,6 +4,7 @@ from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 
 
+# класс главной страницы
 class MainPage(BasePage):
     def __init__(self, driver, url='', timeout=10):
         if url is False:
@@ -14,16 +15,11 @@ class MainPage(BasePage):
         self.go_to_catalog_from_ad = (By.XPATH,
                          '//*[@href="https://lenta.com/catalog/?utm_source=lweb&utm_medium=banner&utm_campaign=up"]')
         self.right_buttons = (By.XPATH, '//*[@class="swiper-slider-button-next"]')
-        self.selection = (By.XPATH,
+        self.selection_board = (By.XPATH,
                           '//*[@src="https://lenta.servicecdn.ru/globalassets/slider-images/2022-06/1326x300__american-tourister_samsonite______.jpg"]')
-        self.meat_category = (By.CSS_SELECTOR, 'a[href="/catalog/myaso-ptica-kolbasa/"]')
+        # этот локатор не только в этом классе
+        self.cookie_agree_button = (By.XPATH, '//*[text()="Согласен"]')
 
-    # авторизация не катит, так как нужны смс из телефона
-    # авторизация и получение cookie
-    # ??? или лучше это в base_page
-    # def authorization(self, locator=''):
-    #     # работает только напрямую
-    #     self.driver.get("https://lenta.com/")
-    #     self.driver.find_element_by_css_selector('[href="/npl/authentication"]').click()
+    # авторизацию не получится использовать, так как нужны смс из телефона
 
 

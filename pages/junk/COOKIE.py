@@ -1,3 +1,5 @@
+# для работы с cookie
+import pickle
 # загрузка кук из файла
 with open("my_cookies.txt", "rb") as cookiesfile:
     cookies = pickle.load(cookiesfile)
