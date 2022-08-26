@@ -36,7 +36,7 @@ def pytest_runtest_makereport(item, call):
     setattr(item, "rep_" + rep.when, rep)
     return rep
 
-
+# ЭТИ ФИКСТУРЫ В ТЕСТАХ НЕ РАБОТАЮТ
 @pytest.fixture
 def web_browser(request, selenium):
     """Фикстура настраивает размер окна браузера и, в случае падения тестов,

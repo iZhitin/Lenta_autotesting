@@ -15,6 +15,7 @@ class MainPage(BasePage):
         self.go_to_catalog_from_ad = (By.XPATH,
                          '//*[@href="https://lenta.com/catalog/?utm_source=lweb&utm_medium=banner&utm_campaign=up"]')
         self.right_buttons = (By.XPATH, '//*[@class="swiper-slider-button-next"]')
+        self.left_buttons = (By.XPATH, '//*[@class="swiper-slider-button-prev"]')
         self.selection_board = (By.XPATH,
                           '//*[@src="https://lenta.servicecdn.ru/globalassets/slider-images/2022-06/1326x300__american-tourister_samsonite______.jpg"]')
         # этот локатор не только в этом классе

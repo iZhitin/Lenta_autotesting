@@ -80,6 +80,25 @@ class BasePage(object):
         web_elements = WebDriverWait(self.driver, 20).until(EC.visibility_of_any_elements_located(locator))
         ActionChains(self.driver).move_to_element(web_elements[index]).click(web_elements[index]).perform()
 
+    # возвращение на предыдущую страницу
+    def go_back(self):
+        # встроенный метод selenium .back() - назад ( .forward() - вперед) - не всегда стабилен
+        try:
+            self.driver.back()
+        except:
+            self.driver.execute_script("window.history.go(-1)")
+
+    # задать масштаб страницы
+    def zoom(self, value):
+        # value - процент
+        # после перезагрузки страницы масштаб возвращается к 100%
+        self.driver.execute_script("document.body.style.zoom='{0}%'".format(value))
+
+    # переключение на страницу по ее номеру
+    def switch_tab(self, tab):
+        # нумерация закладок с 0
+        self.driver.switch_to.window(self.driver.window_handles[tab])
+
     # сохранение cookie
     def save_cookies(self):
         with open("my_cookies.txt", "wb") as cookies:
