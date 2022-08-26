@@ -102,3 +102,68 @@ class TestMainPageClass:
         assert before != after \
                and after == 'https://lenta.com/catalog/?utm_source=lweb&utm_medium=banner&utm_campaign=up', \
                             "Открылась неожиданная страница или переход не осуществлен вовсе"
+
+
+    def ttest_header_logo_icon_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        page.wait_scroll_and_click_on_element(page.profile_icon)
+        selenium.find_element(*page.header_logo).click()
+        time.sleep(5)
+        assert selenium.current_url == 'https://lenta.com/', "Переход на главную страницу не осуществляется"
+
+    def ttest_header_search_icon_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        page.wait_scroll_and_click_on_element(page.search_icon)
+
+    def ttest_header_profile_icon_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        page.wait_scroll_and_click_on_element(page.profile_icon)
+
+    def ttest_header_liked_icon_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        page.wait_scroll_and_click_on_element(page.liked_icon)
+
+    def ttest_header_cart_icon_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        page.wait_scroll_and_click_on_element(page.cart_icon)
+
+
+
+    def ttest_search_field(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+        # selenium.set_window_size(480, 320)
+        # поскольку при масштабе 110% (такой масштаб при запуске тестов), поисковое поле не видно, нужно изменить масштаб
+        # page.zoom(50)
+        # смысла в изменении масштаба нет, так как поисковое поле не появляется
+        page.wait_scroll_and_click_on_element(page.search_icon)
+        page.enter_text_and_press_return(page.inner_search_field, 'капуста\n')
+        # a = selenium.find_element(*page.inner_search_field)
+            # .submit()
+        # selenium.find_element(*page.poooisk).click()
+        # selenium.execute_script("$('input').trigger(jQuery.Event('keydown', { which: 13 }));")
+        # selenium.execute_script("arguments[0].keypress();", a)
+        # selenium.execute_script("document.getElementsByClassName('catalog-search-popup__input').click();")
+        # selenium.find_element(*page.inner_search_field).submit()
+
+        time.sleep(5)
+

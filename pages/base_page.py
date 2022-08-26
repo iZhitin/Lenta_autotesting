@@ -55,6 +55,17 @@ class BasePage(object):
         # наведение мыши на центр элемента и клик
         ActionChains(self.driver).move_to_element(web_element).click(web_element).perform()
 
+
+    # прокрутка до элемента, ожидание видимости, движение мыши к центру элемента и клик
+    def wait_and_scroll_to_element(self, locator):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        # наведение мыши на центр элемента и клик
+        ActionChains(self.driver).move_to_element(web_element).perform()
+
+
     # прокрутка до ОДНОГО ИЗ элементов, ожидание видимости, движение мыши к центру элемента и клик
     # нумерация с нуля
     def wait_scroll_and_click_on_one_of_elements(self, locator, index):
@@ -98,6 +109,18 @@ class BasePage(object):
     def switch_tab(self, tab):
         # нумерация закладок с 0
         self.driver.switch_to.window(self.driver.window_handles[tab])
+
+    # ввод текста и нажатие кнопки enter ???
+    def enter_text_and_press_return(self, locator, text):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        # КНОПКИ ENTER И RETURN - НЕ РАБОТАЮТ
+        ActionChains(self.driver).move_to_element(web_element).key_down(Keys.SHIFT).send_keys(text).send_keys('\ue007').perform()
+        # ActionChains(self.driver).send_keys(u'\ue007').perform()
+
+
 
     # сохранение cookie
     def save_cookies(self):
