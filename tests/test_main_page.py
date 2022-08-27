@@ -103,6 +103,27 @@ class TestMainPageClass:
                and after == 'https://lenta.com/catalog/?utm_source=lweb&utm_medium=banner&utm_campaign=up', \
                             "Открылась неожиданная страница или переход не осуществлен вовсе"
 
+    def ttest_header_catalog_button_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        before = selenium.current_url
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # установим размер окна (разрешение меняется тоже), чтобы нужный элемент был на странице
+        # после изменения размера, нужный элемент подтягивается
+        selenium.set_window_size(1035, 768)
+        # клик на кнопку каталога
+        page.wait_scroll_and_click_on_element(page.catalog)
+
+        # проверка перехода на другую страницу
+        after = selenium.current_url
+
+        assert before != after \
+               and after == 'https://lenta.com/catalog/', \
+                            "Открылась неожиданная страница или переход не осуществлен вовсе"
 
     def ttest_header_logo_icon_clickable(self, selenium):
         # создаем экземпляр класса тестируемой страницы
@@ -114,6 +135,28 @@ class TestMainPageClass:
         time.sleep(5)
         assert selenium.current_url == 'https://lenta.com/', "Переход на главную страницу не осуществляется"
 
+    def ttest_header_store_button_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # нажатие на кнопку "магазины" в хэдере
+        page.wait_scroll_and_click_on_element(page.stores)
+        time.sleep(3)
+        assert page.is_presented(page.store_window) is True, \
+            "Окно с картой не открывается"
+
+    def ttest_header_delivery_button_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # нажатие на кнопку "магазины" в хэдере
+        page.wait_scroll_and_click_on_element(page.delivery)
+        time.sleep(3)
+        assert page.is_presented(page.delivery_window) is True, \
+            "Окно с картой не открывается"
+
     def ttest_header_search_icon_clickable(self, selenium):
         # создаем экземпляр класса тестируемой страницы
         page = MainPage(selenium)
@@ -121,12 +164,22 @@ class TestMainPageClass:
         selenium.get(page.url)
         page.wait_scroll_and_click_on_element(page.search_icon)
 
-    def ttest_header_profile_icon_clickable(self, selenium):
+    def ttest_header_profile_icon_clickable_at_100_zoom(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        selenium.set_window_size(1035, 768)
+        page.wait_scroll_and_click_on_element(page.profile_icon)
+        time.sleep(3)
+
+    def ttest_header_profile_icon_clickable_at_110_zoom(self, selenium):
         # создаем экземпляр класса тестируемой страницы
         page = MainPage(selenium)
         # открываем главную страницу
         selenium.get(page.url)
         page.wait_scroll_and_click_on_element(page.profile_icon)
+        time.sleep(3)
 
     def ttest_header_liked_icon_clickable(self, selenium):
         # создаем экземпляр класса тестируемой страницы
@@ -142,7 +195,7 @@ class TestMainPageClass:
         selenium.get(page.url)
         page.wait_scroll_and_click_on_element(page.cart_icon)
 
-    def test_search_field(self, selenium):
+    def ttest_search_field(self, selenium):
         # создаем экземпляр класса тестируемой страницы
         page = MainPage(selenium)
         # установим размер окна (разрешение меняется тоже), чтобы нужный элемент был на странице
@@ -160,4 +213,159 @@ class TestMainPageClass:
         assert page.is_presented(page.search_results) is True, "На странице нет элемента с фразой " \
                                                                "'Результаты поиска'"
 
+    # @pytest.mark.footer
+    def ttest_footer_privacy_policy_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
 
+        # клик на элемент
+        page.wait_scroll_and_click_on_element(page.privacy_policy)
+
+        assert selenium.current_url == 'https://lenta.com/pokupatelyam/privacy-policy/', \
+            "Переход на страницу с политикой конфиденциальности не осуществлен"
+
+    def ttest_footer_phone_icon_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # клик на элемент
+        page.wait_scroll_and_click_on_element(page.phone_link)
+        time.sleep(3)
+        # уведомление на уровне браузера появляется, но selenium его не видит
+        # selenium.switch_to_alert.accept()
+        time.sleep(3)
+
+    def ttest_footer_telegram_icon_link_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # клик на элемент
+        page.wait_scroll_and_click_on_element(page.telegram_icon_link)
+        time.sleep(3)
+
+    def ttest_footer_whatsapp_icon_link_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # клик на элемент
+        page.wait_scroll_and_click_on_element(page.whatsapp_icon_link)
+        time.sleep(3)
+
+    def ttest_footer_about_company_link_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # клик на элемент
+        page.wait_scroll_to_center_and_click_on_element(page.about_company)
+        # если не прокручивать до того, пока элемент не будет в середине, то он
+        # будет чем-то загражден и клик придется на другой элемент
+        time.sleep(3)
+        assert selenium.current_url == 'https://lenta.com/o-kompanii/', \
+            "Переход на страницу 'о компании' не осуществлен"
+
+    def ttest_footer_to_customers_link_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # клик на элемент
+        page.wait_scroll_to_center_and_click_on_element(page.to_customers)
+        time.sleep(3)
+        assert selenium.current_url == 'https://lenta.com/pokupatelyam/', \
+            "Переход на страницу 'покупателям' не осуществлен"
+
+    def ttest_footer_to_legal_persons_link_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # клик на элемент
+        page.wait_scroll_to_center_and_click_on_element(page.to_legal_persons)
+        time.sleep(3)
+        assert selenium.current_url == 'https://lenta.com/postavshchikam/', \
+            "Переход на страницу 'поставщикам' не осуществлен"
+
+    def ttest_footer_links_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # прокликивание элементов
+        for i in range(len(selenium.find_elements(*page.footer_links))):
+            page.wait_scroll_and_click_on_one_of_elements(page.footer_links, i)
+            # так как некоторые ссылки открывают новую страницу:
+            page.switch_tab(0)
+            time.sleep(1.5)
+
+    def ttest_footer_estimate_website_link_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # клик на элемент
+        page.wait_scroll_and_click_on_element(page.estimate_website)
+        time.sleep(3)
+        assert page.is_presented(page.feedback_form) is True, \
+            "Фидбэк форма не всплыла"
+
+    def ttest_footer_mobile_app_icon_links_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # прокликивание иконок (ссылок) на приложения
+        for i in range(len(selenium.find_elements(*page.mobile_applications))):
+            page.wait_and_click_on_one_of_elements(page.mobile_applications, i)
+            # можно возвращаться на вкладку
+            # page.switch_tab(0)
+        time.sleep(3)
+
+    def ttest_footer_social_media_icon_links_clickable(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # прокликивание иконок (ссылок) на соцсети
+        for i in range(len(selenium.find_elements(*page.social_medias))):
+            page.wait_and_click_on_one_of_elements(page.social_medias, i)
+            # можно возвращаться на вкладку
+            # page.switch_tab(0)
+        time.sleep(3)

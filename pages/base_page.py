@@ -60,6 +60,24 @@ class BasePage(object):
         # наведение мыши на центр элемента и клик
         ActionChains(self.driver).move_to_element(web_element).click(web_element).perform()
 
+    # ожидание видимости, прокрутка до элемента в середине экрана, движение мыши к центру элемента и клик
+    def wait_scroll_to_center_and_click_on_element(self, locator):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        # наведение мыши на центр элемента и клик
+        ActionChains(self.driver)\
+            .send_keys(Keys.ARROW_UP)\
+            .send_keys(Keys.ARROW_UP)\
+            .send_keys(Keys.ARROW_UP)\
+            .send_keys(Keys.ARROW_UP)\
+            .send_keys(Keys.ARROW_UP)\
+            .move_to_element(web_element).click(web_element).perform()
+
+    # прокрутка в самый низ, чтобы прогрузить страницу
+    def scroll_to_page_bottom(self):
+        self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
 
     # прокрутка до элемента, ожидание видимости, движение мыши к центру элемента и клик
     def wait_and_scroll_to_element(self, locator):
@@ -110,7 +128,7 @@ class BasePage(object):
         # после перезагрузки страницы масштаб возвращается к 100%
         self.driver.execute_script("document.body.style.zoom='{0}%'".format(value))
 
-    # переключение на страницу по ее номеру
+    # реальное (а не видимое) переключение на страницу по ее номеру
     def switch_tab(self, tab):
         # нумерация закладок с 0
         self.driver.switch_to.window(self.driver.window_handles[tab])
