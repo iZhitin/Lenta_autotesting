@@ -142,28 +142,22 @@ class TestMainPageClass:
         selenium.get(page.url)
         page.wait_scroll_and_click_on_element(page.cart_icon)
 
-
-
-    def ttest_search_field(self, selenium):
+    def test_search_field(self, selenium):
         # создаем экземпляр класса тестируемой страницы
         page = MainPage(selenium)
+        # установим размер окна (разрешение меняется тоже), чтобы нужный элемент был на странице
+        selenium.set_window_size(1035, 768)
         # открываем главную страницу
         selenium.get(page.url)
         # соглашение с cookie
         page.wait_scroll_and_click_on_element(page.cookie_agree_button)
-        # selenium.set_window_size(480, 320)
-        # поскольку при масштабе 110% (такой масштаб при запуске тестов), поисковое поле не видно, нужно изменить масштаб
-        # page.zoom(50)
-        # смысла в изменении масштаба нет, так как поисковое поле не появляется
-        page.wait_scroll_and_click_on_element(page.search_icon)
-        page.enter_text_and_press_return(page.inner_search_field, 'капуста\n')
-        # a = selenium.find_element(*page.inner_search_field)
-            # .submit()
-        # selenium.find_element(*page.poooisk).click()
-        # selenium.execute_script("$('input').trigger(jQuery.Event('keydown', { which: 13 }));")
-        # selenium.execute_script("arguments[0].keypress();", a)
-        # selenium.execute_script("document.getElementsByClassName('catalog-search-popup__input').click();")
-        # selenium.find_element(*page.inner_search_field).submit()
 
-        time.sleep(5)
+        # обращение к поисковому полю, ввод и нажатие кнопки поиск
+        page.wait_scroll_and_click_on_element(page.search_field)
+        page.enter_text(page.search_field, 'капуста')
+        page.wait_scroll_and_click_on_element(page.search_icon_button)
+
+        assert page.is_presented(page.search_results) is True, "На странице нет элемента с фразой " \
+                                                               "'Результаты поиска'"
+
 

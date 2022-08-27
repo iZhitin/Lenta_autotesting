@@ -2,6 +2,7 @@
 import time
 from urllib.parse import urlparse
 # для явного ожидания
+from pyvirtualdisplay import Display
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 # для выполнения действий
@@ -17,6 +18,10 @@ import pickle
 # для удобной работы с локаторами импортируем метод By
 from selenium.webdriver.common.by import By
 
+# для изменения разрешения дисплея
+# from pyvirtualdisplay import Display
+# для нажатия клавиш
+# from pynput.keyboard import Key, Controller
 
 # класс основной страницы
 class BasePage(object):
@@ -110,17 +115,68 @@ class BasePage(object):
         # нумерация закладок с 0
         self.driver.switch_to.window(self.driver.window_handles[tab])
 
+    # ввод текста в текстовое поле
+    def enter_text(self, locator, text):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        ActionChains(self.driver).move_to_element(web_element).send_keys(text).perform()
+
     # ввод текста и нажатие кнопки enter ???
     def enter_text_and_press_return(self, locator, text):
         # локатор в формате (By.LOCATOR, 'locator')
         web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
         # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
         self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
-        # КНОПКИ ENTER И RETURN - НЕ РАБОТАЮТ
-        ActionChains(self.driver).move_to_element(web_element).key_down(Keys.SHIFT).send_keys(text).send_keys('\ue007').perform()
-        # ActionChains(self.driver).send_keys(u'\ue007').perform()
+        # ДЛЯ имитации ввода ни одна из следующих команд - не работает
+        # в поисковом поле (внешнем и внутреннем) на сайте Лента
+        # web_element.submit()
+        # .send_keys(text\n)
+        # .send_keys(u'\ue007')
+        # .send_keys('\ue007')
+        # .send_keys(Keys.ENTER)
+        # .send_keys(Keys.RETURN)
+        ActionChains(self.driver).move_to_element(web_element).send_keys(text).send_keys(Keys.ENTER).perform()
 
+        # для изменения разрешения дисплея
+        # from pyvirtualdisplay import Display
+        # display = Display(size=(800, 600))
+        # display.start()
 
+        # для нажатия клавиш
+        # from pynput.keyboard import Key, Controller
+        # keyboard = Controller()
+        # keyboard.press(Key.enter)
+        # keyboard.release(Key.enter)
+
+    # поиск элемента на странице
+    def seek_element(self, locator, timeout=10):
+        element = None
+        try:
+            element = WebDriverWait(self.driver, timeout).until(
+               EC.presence_of_element_located(locator))
+        except:
+            # print(colored('Element not found on the page!', 'red'))
+            print('Element is not found on the page!')
+        # если элемент удается найти, то он возвращается (веб элемент)
+        return element
+
+    # проверка существования элемента на странице (True или False)
+    def is_presented(self, locator):
+        element = self.seek_element(locator, timeout=1)
+        # немного не поддается пониманию, но работает
+        return element is not None
+
+    def presence(self, locator):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(locator))
+
+        def wait_presence(self, locator):
+            # локатор в формате (By.LOCATOR, 'locator')
+            web_element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(locator))
+            web_element.click()
+            return web_element
 
     # сохранение cookie
     def save_cookies(self):
