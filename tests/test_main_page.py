@@ -10,13 +10,26 @@ import time
 # импортируем класс тестируемой страницы
 from pages.main_page import MainPage
 
-
 # для запуска тестов через терминал:
 # python -m pytest -v --driver Chrome --driver-path chromedriver.exe tests\test_main_page.py
 
-# import pytest
+# для параметризации
+from modules import *
+from parsed_products import product_list
+user_product_list = ['капуста', 'яйца', 'ананас']
+
 # @pytest.mark.main_page
 # # ModuleNotFoundError: No module named 'pages'
+
+
+# параметры браузера во время теста
+# @pytest.fixture
+# def chrome_options(chrome_options):
+#     # chrome_options.binary_location = '/usr/bin/google-chrome-stable'
+#     chrome_options.add_argument('--headless')
+#     # chrome_options.add_argument('--no-sandbox')
+#     # chrome_options.add_argument('--log-level=DEBUG')
+#     return chrome_options
 
 
 # попытки вынести создание экземпляра в самое начало, чтобы не дублировать в каждом тесте
@@ -25,6 +38,8 @@ from pages.main_page import MainPage
 #     def __init__(self, selenium):
 #         self.selenium = selenium
 #         self.p = MainPage(selenium)
+
+
 
 class TestMainPageClass:
 
@@ -101,7 +116,7 @@ class TestMainPageClass:
 
         assert before != after \
                and after == 'https://lenta.com/catalog/?utm_source=lweb&utm_medium=banner&utm_campaign=up', \
-                            "Открылась неожиданная страница или переход не осуществлен вовсе"
+            "Открылась неожиданная страница или переход не осуществлен вовсе"
 
     def ttest_header_catalog_button_clickable(self, selenium):
         # создаем экземпляр класса тестируемой страницы
@@ -123,7 +138,7 @@ class TestMainPageClass:
 
         assert before != after \
                and after == 'https://lenta.com/catalog/', \
-                            "Открылась неожиданная страница или переход не осуществлен вовсе"
+            "Открылась неожиданная страница или переход не осуществлен вовсе"
 
     def ttest_header_logo_icon_clickable(self, selenium):
         # создаем экземпляр класса тестируемой страницы
@@ -133,7 +148,8 @@ class TestMainPageClass:
         page.wait_scroll_and_click_on_element(page.profile_icon)
         selenium.find_element(*page.header_logo).click()
         time.sleep(5)
-        assert selenium.current_url == 'https://lenta.com/', "Переход на главную страницу не осуществляется"
+        assert selenium.current_url == 'https://lenta.com/', \
+            "Переход на главную страницу не осуществляется"
 
     def ttest_header_store_button_clickable(self, selenium):
         # создаем экземпляр класса тестируемой страницы
@@ -210,8 +226,8 @@ class TestMainPageClass:
         page.enter_text(page.search_field, 'капуста')
         page.wait_scroll_and_click_on_element(page.search_icon_button)
 
-        assert page.is_presented(page.search_results) is True, "На странице нет элемента с фразой " \
-                                                               "'Результаты поиска'"
+        assert page.is_presented(page.successful_search_results) is True, \
+            "На странице нет элемента с фразой 'Результаты поиска'"
 
     # @pytest.mark.footer
     def ttest_footer_privacy_policy_clickable(self, selenium):
@@ -369,3 +385,111 @@ class TestMainPageClass:
             # можно возвращаться на вкладку
             # page.switch_tab(0)
         time.sleep(3)
+
+    # @pytest.mark.xfail
+    # добавление акционного товара с главной страницы
+    def ttest_all_goods_can_be_added_to_busket_from_main_page(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # если использовать цикл for с i, то элементы будут перебираться через один, так как локаторов становится меньше
+        # добавление каждого элемента на странице в корзину
+        # количество элементов
+        amount_of_elements = len(selenium.find_elements(*page.add_to_busket_button))
+        count = int(amount_of_elements)
+        while True:
+            try:
+                page.wait_scroll_and_click_on_one_of_elements(page.add_to_busket_button, 0)
+                time.sleep(1)
+                count -= 1
+                if count == 0:
+                    break
+            except:
+                break
+
+        selenium.refresh()
+        time.sleep(2)
+        # без * будет ошибка InvalidArgumentException: Message: invalid argument: 'using' must be a string
+        assert selenium.find_element(*page.amount_of_goods).text == str(
+            amount_of_elements), "Не все товары добавлены в корзину"
+
+    # # добавление скрытых из видимости акционных товаров с главной страницы
+    # def test_all_hidden_goods_can_be_added_to_busket_from_main_page(self, selenium):
+    #     # создаем экземпляр класса тестируемой страницы
+    #     page = MainPage(selenium)
+    #     # открываем главную страницу
+    #     selenium.get(page.url)
+    #     # соглашение с cookie
+    #     page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+    #
+    #     # если использовать цикл for с i, то элементы будут перебираться через один, так как локаторов становится меньше
+    #     # добавление каждого элемента на странице в корзину
+    #     # количество элементов
+    #     # попытка добавить скрытые товары на главной странице
+    #     i = 10
+    #     while True:
+    #         while True:
+    #             try:
+    #                 page.wait_scroll_and_click_on_one_of_elements(page.add_to_busket_button, 0)
+    #             except:
+    #                 page.wait_scroll_and_click_on_one_of_elements(page.right_buttons, i)
+    #         i -= 1
+    #         if i < 0:
+    #             break
+
+
+    # если предыдущий тест с параметризацией - заблокирован, то его параметризация не передается
+    # в следующий тест
+    # params=product_list - не работает, а просто product_list - работает
+    @pytest.mark.parametrize("search_text",
+                                 product_list,
+                                 ids=product_list)
+    def test_positive_search_requests(self, selenium, search_text):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # установим размер окна (разрешение меняется тоже), чтобы нужный элемент был на странице
+        selenium.set_window_size(1035, 768)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie (даже если не согласиться и перезагрузить страницу, то второго запроса не будет)
+        # каждый раз нажимать на эту кнопку будет слишком долга, ведь список состоит из 1647 позиций
+        # page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # обращение к поисковому полю, ввод и нажатие кнопки поиск
+        page.wait_scroll_and_click_on_element(page.search_field)
+        page.enter_text(page.search_field, search_text)
+        page.wait_scroll_and_click_on_element(page.search_icon_button)
+        # 1.5 секунды ожидания
+        assert page.is_presented(page.successful_search_results, 1.5) is True, \
+            "На странице нет элемента с фразой 'Результаты поиска'"
+
+
+    @pytest.mark.parametrize("search_text",
+                                 [russian_chars(), russian_chars().upper(),
+                                  english_chars(), english_chars().upper(),
+                                  digits(3), generate_string(100), special_chars(),
+                                  chinese_chars(), chinese_chars().upper(), empty_space(30), everything(3)],
+                                 ids=['russian_chars', 'RUSSIAN_CHARS', 'english_chars', 'ENGLISH_CHARS',
+                                      'digits', '1100 symbols', 'special_chars', 'chinese_chars', 'CHINESE_CHARS',
+                                      '30_spaces', 'combination_of_previous'])
+    def ttest_negative_search_requests(self, selenium, search_text):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # установим размер окна (разрешение меняется тоже), чтобы нужный элемент был на странице
+        selenium.set_window_size(1035, 768)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie (даже если не согласиться и перезагрузить страницу, то второго запроса не будет)
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+
+        # обращение к поисковому полю, ввод и нажатие кнопки поиск
+        page.wait_scroll_and_click_on_element(page.search_field)
+        page.enter_text(page.search_field, search_text)
+        page.wait_scroll_and_click_on_element(page.search_icon_button)
+
+        assert page.is_presented(page.unsuccessful_search_results) is True, \
+            "На странице нет элемента с фразой 'Мы ничего не нашли'"

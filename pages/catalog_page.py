@@ -83,6 +83,7 @@ class CatalogPage(BasePage):
 
 
         # локаторы элементов элементов страницы
+        # этот локатор не только в этом классе
         self.add_to_busket_button = (By.CSS_SELECTOR, '.sku-card-small-basket-control__default-control')
         # self.add_to_busket_button = (By.CSS_SELECTOR, '.sku-card-small-basket-control__default-control')
         # self.add_to_busket_button = (By.XPATH, '//*[text()="В корзину"]')
@@ -92,6 +93,7 @@ class CatalogPage(BasePage):
         self.cookie_agree_button = (By.XPATH, '//*[text()="Согласен"]')
 
         # количество (цифра у корзины) добавленных товаров
+        # этот локатор не только в этом классе
         self.amount_of_goods = (By.CSS_SELECTOR, ".header-catalog-link__counter.js-sku-counter-basket.header-catalog-link__counter--show")
 
 

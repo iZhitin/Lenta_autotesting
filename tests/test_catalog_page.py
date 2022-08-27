@@ -16,7 +16,7 @@ from pages.catalog_page import CatalogPage
 
 class TestCatalogPageClass:
 
-    def ttest_all_goods_can_be_added_to_busket(self, selenium):
+    def ttest_all_goods_can_be_added_to_busket_from_meat_category_page(self, selenium):
         # Проверка того, что все продукты могут быть добавлены в корзину
         # на первой странице категории "мясо, птица, колбаса"
         # Для тестирования другой категории, нужно просто поменять одну переменную

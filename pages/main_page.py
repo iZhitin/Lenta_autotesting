@@ -49,7 +49,8 @@ class MainPage(BasePage):
         self.search_icon = (By.CSS_SELECTOR, '.icon.header__search-bar-icon')
         self.inner_search_field = (By.CSS_SELECTOR, '.catalog-search-popup__input')
         # результаты поиска
-        self.search_results = (By.XPATH, '//*[text()="Результаты поиска"]')
+        self.successful_search_results = (By.XPATH, '//*[text()="Результаты поиска"]')
+        self.unsuccessful_search_results = (By.XPATH, '//*[text()="Мы ничего не нашли"]')
 
         # footer
         # таких два
@@ -73,6 +74,15 @@ class MainPage(BasePage):
         self.mobile_applications = (By.CSS_SELECTOR, ".footer__mobile-app")
         # ссылки на соцсети
         self.social_medias = (By.CSS_SELECTOR, '.footer__social-panel-item')
+
+
+
+        # этот локатор не только в этом классе
+        self.add_to_busket_button = (By.CSS_SELECTOR, '.sku-card-small-basket-control__default-control')
+
+        # этот локатор не только в этом классе
+        self.amount_of_goods = (By.CSS_SELECTOR, ".header-catalog-link__counter.js-sku-counter-basket.header-catalog-link__counter--show")
+
 
 # '.footer__main-nav.main-nav .main-nav__item-select')
 # footer__main-nav main-nav

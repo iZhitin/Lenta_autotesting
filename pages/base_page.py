@@ -175,14 +175,15 @@ class BasePage(object):
             element = WebDriverWait(self.driver, timeout).until(
                EC.presence_of_element_located(locator))
         except:
+            pass
             # print(colored('Element not found on the page!', 'red'))
-            print('Element is not found on the page!')
+            # print('Element is not found on the page!')
         # если элемент удается найти, то он возвращается (веб элемент)
         return element
 
     # проверка существования элемента на странице (True или False)
-    def is_presented(self, locator):
-        element = self.seek_element(locator, timeout=1)
+    def is_presented(self, locator, timeout=5):
+        element = self.seek_element(locator, timeout)
         # немного не поддается пониманию, но работает
         return element is not None
 
