@@ -7,11 +7,9 @@ from selenium.webdriver.common.by import By
 # класс главной страницы
 class MainPage(BasePage):
     def __init__(self, driver, url='', timeout=10):
-        if url is True:
-            self.url = url
         if url is False:
             self.url = "https://lenta.com/"
-        super().__init__(driver, self.url)
+        super().__init__(driver, url)
 
         # локаторы элементов страницы
         # этот локатор не только в этом классе

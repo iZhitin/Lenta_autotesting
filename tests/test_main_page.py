@@ -632,8 +632,8 @@ def test_social_media_icon_links_in_footer_clickable(selenium):
 
 @pytest.mark.main_page
 @pytest.mark.medium
-@pytest.mark.xfail
 @pytest.mark.basket
+@pytest.mark.xfail
 def test_all_goods_can_be_added_to_basket_from_main_page(selenium):
     """Все видимые товары с главной страницы могут быть добавлены в корзину."""
 
@@ -748,7 +748,6 @@ def test_negative_search_requests(selenium, search_text):
 @pytest.mark.main_page
 @pytest.mark.medium
 @pytest.mark.user
-@pytest.mark.basket
 def test_user_story_pickup(selenium):
     """Имитация действий пользователя: выбор места самовывоза и добавление товаров
     (2 - из категорий в каталоге, 2 - из карточек товаров, 3 - из поиска)."""
