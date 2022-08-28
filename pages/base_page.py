@@ -60,6 +60,35 @@ class BasePage(object):
         # наведение мыши на центр элемента и клик
         ActionChains(self.driver).move_to_element(web_element).click(web_element).perform()
 
+
+    # прокрутка до ОДНОГО ИЗ элементов, ожидание видимости, движение мыши к центру элемента и клик
+    # нумерация с нуля
+    def wait_to_be_clickable_of_one_of_elements(self, locator, index):
+        # локатор в формате (By.LOCATOR, 'locator')
+        # можно МЕНЯТЬ с any на all
+        try:
+            web_elements = WebDriverWait(self.driver, 10).until(EC.visibility_of_any_elements_located(locator))
+            web_elements[index].click()
+            return True
+        except:
+            return False
+
+    # НЕ РАБОТАЕТ
+    def wait_page_fully_loaded(self):
+        # html_before = self.driver.page_source
+        # WebDriverWait(self.driver, 10).until
+        WebDriverWait(self.driver, 60).until(self.driver.execute_script("return document.readyState == 'complete';"))
+
+
+    # прокрутка до элемента, ожидание видимости и получение текста тега
+    def wait_scroll_and_get_text_of_element(self, locator):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        # наведение мыши на центр элемента и клик
+        return web_element.text
+
     # ожидание видимости, прокрутка до элемента в середине экрана, движение мыши к центру элемента и клик
     def wait_scroll_to_center_and_click_on_element(self, locator):
         # локатор в формате (By.LOCATOR, 'locator')
@@ -117,10 +146,11 @@ class BasePage(object):
     # возвращение на предыдущую страницу
     def go_back(self):
         # встроенный метод selenium .back() - назад ( .forward() - вперед) - не всегда стабилен
+        # поменял местами
         try:
-            self.driver.back()
-        except:
             self.driver.execute_script("window.history.go(-1)")
+        except:
+            self.driver.back()
 
     # задать масштаб страницы
     def zoom(self, value):
@@ -134,12 +164,15 @@ class BasePage(object):
         self.driver.switch_to.window(self.driver.window_handles[tab])
 
     # ввод текста в текстовое поле
-    def enter_text(self, locator, text):
+    def clear_and_enter_text(self, locator, text):
         # локатор в формате (By.LOCATOR, 'locator')
         web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
         # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
         self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
-        ActionChains(self.driver).move_to_element(web_element).send_keys(text).perform()
+        ActionChains(self.driver).move_to_element(web_element).double_click()\
+            .click_and_hold()\
+            .send_keys(Keys.CLEAR)\
+            .send_keys(text).perform()
 
     # ввод текста и нажатие кнопки enter ???
     def enter_text_and_press_return(self, locator, text):

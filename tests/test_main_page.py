@@ -9,6 +9,9 @@ import time
 
 # импортируем класс тестируемой страницы
 from pages.main_page import MainPage
+# и не только
+from pages.catalog_page import CatalogPage
+from pages.product_page import ProductPage
 
 # для запуска тестов через терминал:
 # python -m pytest -v --driver Chrome --driver-path chromedriver.exe tests\test_main_page.py
@@ -162,6 +165,86 @@ class TestMainPageClass:
         assert page.is_presented(page.store_window) is True, \
             "Окно с картой не открывается"
 
+    # тест со свободным вводом
+    # @pytest.mark.xfail
+    def ttest_input_store_address_works(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # нажатие на кнопку "магазины" в хэдере
+        page.wait_scroll_and_click_on_element(page.stores)
+        time.sleep(3)
+        # нажатие на внутреннюю кнопку "Магазины / Самовывоз"
+        page.wait_scroll_and_click_on_element(page.inner_store_button)
+
+        # адрес магазина (или самовывоза)
+        first = "Санкт-Петербург "
+        second = "Обводного  "
+        third = "канала "
+        fourth = "118"
+        text = first + second + third + fourth
+        # клик на текстовое поле, очистка, ввод и отправка адреса
+        page.wait_scroll_and_click_on_element(page.inner_address_input_field)
+        page.clear_and_enter_text(page.inner_address_input_field, text)
+        page.wait_scroll_and_click_on_element(page.inner_show_addresses_by_list_button)
+        time.sleep(5)
+
+        assert page.wait_to_be_clickable_of_one_of_elements(page.dropped_list_of_store_addresses, 0), \
+            "Первый магазин из выпадающего списка - не кликабелен"
+
+    # тест со строгим вводом
+    def ttest_input_store_address_works(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # нажатие на кнопку "магазины" в хэдере
+        page.wait_scroll_and_click_on_element(page.stores)
+        time.sleep(3)
+        # нажатие на внутреннюю кнопку "Магазины / Самовывоз"
+        page.wait_scroll_and_click_on_element(page.inner_store_button)
+
+        # адрес магазина (или самовывоза)
+        text = "ул. 1-я Красноармейская, д. 15, лит. А"
+        # клик на текстовое поле, очистка, ввод и отправка адреса
+        page.wait_scroll_and_click_on_element(page.inner_address_input_field)
+        page.clear_and_enter_text(page.inner_address_input_field, text)
+        page.wait_scroll_and_click_on_element(page.inner_show_addresses_by_list_button)
+        time.sleep(5)
+
+        assert page.wait_to_be_clickable_of_one_of_elements(page.dropped_list_of_store_addresses, 0), \
+            "Первый магазин из выпадающего списка - не кликабелен"
+
+    # тест также со строгим вводом
+    def ttest_choose_after_input_store_address(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # нажатие на кнопку "магазины" в хэдере
+        page.wait_scroll_and_click_on_element(page.stores)
+        time.sleep(3)
+        # нажатие на внутреннюю кнопку "Магазины / Самовывоз"
+        page.wait_scroll_and_click_on_element(page.inner_store_button)
+
+        # адрес магазина (или самовывоза)
+        text = "ул. 1-я Красноармейская, д. 15, лит. А"
+        # клик на текстовое поле, очистка, ввод и отправка адреса
+        page.wait_scroll_and_click_on_element(page.inner_address_input_field)
+        page.clear_and_enter_text(page.inner_address_input_field, text)
+        page.wait_scroll_and_click_on_element(page.inner_show_addresses_by_list_button)
+        time.sleep(5)
+
+        page.wait_scroll_and_click_on_one_of_elements(page.dropped_list_of_store_addresses, 0)
+        time.sleep(5)
+        page.wait_scroll_and_click_on_element(page.inner_choose_store_button)
+        # НУЖНО прописать адекватную функцию загрузки страницы
+        # page.wait_page_fully_loaded
+        time.sleep(10)
+        assert 'Красноармейская' in page.wait_scroll_and_get_text_of_element(page.address),\
+            "Адрес в системе отличается от введенного"
+
     def ttest_header_delivery_button_clickable(self, selenium):
         # создаем экземпляр класса тестируемой страницы
         page = MainPage(selenium)
@@ -172,6 +255,32 @@ class TestMainPageClass:
         time.sleep(3)
         assert page.is_presented(page.delivery_window) is True, \
             "Окно с картой не открывается"
+
+    # @pytest.mark.xfail
+    def ttest_input_delivery_address_works(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # соглашение с cookie
+        page.wait_scroll_and_click_on_element(page.cookie_agree_button)
+        # нажатие на кнопку "магазины" в хэдере
+        page.wait_scroll_and_click_on_element(page.delivery)
+        time.sleep(3)
+
+        # адрес доставки
+        first = "Санкт-петербург "
+        second = "Дворцовая "
+        third = "площадь "
+        fourth = "2"
+        text = first + second + third + fourth
+        # клик на текстовое поле, очистка, ввод и отправка адреса
+        page.wait_scroll_and_click_on_element(page.inner_address_input_field)
+        page.clear_and_enter_text(page.inner_address_input_field, text)
+        page.wait_scroll_and_click_on_element(page.address_confirmation_button)
+        time.sleep(5)
+        assert second in page.wait_scroll_and_get_text_of_element(page.address), \
+            "Адрес в системе отличается от введенного"
 
     def ttest_header_search_icon_clickable(self, selenium):
         # создаем экземпляр класса тестируемой страницы
@@ -223,7 +332,7 @@ class TestMainPageClass:
 
         # обращение к поисковому полю, ввод и нажатие кнопки поиск
         page.wait_scroll_and_click_on_element(page.search_field)
-        page.enter_text(page.search_field, 'капуста')
+        page.clear_and_enter_text(page.search_field, 'капуста')
         page.wait_scroll_and_click_on_element(page.search_icon_button)
 
         assert page.is_presented(page.successful_search_results) is True, \
@@ -399,11 +508,11 @@ class TestMainPageClass:
         # если использовать цикл for с i, то элементы будут перебираться через один, так как локаторов становится меньше
         # добавление каждого элемента на странице в корзину
         # количество элементов
-        amount_of_elements = len(selenium.find_elements(*page.add_to_busket_button))
+        amount_of_elements = len(selenium.find_elements(*page.add_to_basket_button))
         count = int(amount_of_elements)
         while True:
             try:
-                page.wait_scroll_and_click_on_one_of_elements(page.add_to_busket_button, 0)
+                page.wait_scroll_and_click_on_one_of_elements(page.add_to_basket_button, 0)
                 time.sleep(1)
                 count -= 1
                 if count == 0:
@@ -448,7 +557,7 @@ class TestMainPageClass:
     @pytest.mark.parametrize("search_text",
                                  product_list,
                                  ids=product_list)
-    def test_positive_search_requests(self, selenium, search_text):
+    def ttest_positive_search_requests(self, selenium, search_text):
         # создаем экземпляр класса тестируемой страницы
         page = MainPage(selenium)
         # установим размер окна (разрешение меняется тоже), чтобы нужный элемент был на странице
@@ -461,7 +570,7 @@ class TestMainPageClass:
 
         # обращение к поисковому полю, ввод и нажатие кнопки поиск
         page.wait_scroll_and_click_on_element(page.search_field)
-        page.enter_text(page.search_field, search_text)
+        page.clear_and_enter_text(page.search_field, search_text)
         page.wait_scroll_and_click_on_element(page.search_icon_button)
         # 1.5 секунды ожидания
         assert page.is_presented(page.successful_search_results, 1.5) is True, \
@@ -488,8 +597,75 @@ class TestMainPageClass:
 
         # обращение к поисковому полю, ввод и нажатие кнопки поиск
         page.wait_scroll_and_click_on_element(page.search_field)
-        page.enter_text(page.search_field, search_text)
+        page.clear_and_enter_text(page.search_field, search_text)
         page.wait_scroll_and_click_on_element(page.search_icon_button)
 
         assert page.is_presented(page.unsuccessful_search_results) is True, \
             "На странице нет элемента с фразой 'Мы ничего не нашли'"
+
+
+    # ЕСЛИ ИСПОЛЬЗОВАТЬ КОМАНДУ gо_back, то товары не сохраняются
+    # вход, выбор магазина и добавление товаров
+    # 3 - из категорий, 3 - из карточек, 1 - из поиска
+    def test_user_story_pickup(self, selenium):
+        # создаем экземпляр класса тестируемой страницы
+        page = MainPage(selenium)
+        # открываем главную страницу
+        selenium.get(page.url)
+        # нажатие на кнопку "магазины" в хэдере
+        page.wait_scroll_and_click_on_element(page.stores)
+        time.sleep(3)
+        # нажатие на внутреннюю кнопку "Магазины / Самовывоз"
+        page.wait_scroll_and_click_on_element(page.inner_store_button)
+
+        # адрес магазина (или самовывоза)
+        text = "наб. Обводного канала, д. 118, к. 7, лит. А"
+        # клик на текстовое поле, очистка, ввод и отправка адреса
+        page.wait_scroll_and_click_on_element(page.inner_address_input_field)
+        page.clear_and_enter_text(page.inner_address_input_field, text)
+        page.wait_scroll_and_click_on_element(page.inner_show_addresses_by_list_button)
+        time.sleep(5)
+
+        # выбор первого магазина из выпадающего списка и подтверждение
+        page.wait_scroll_and_click_on_one_of_elements(page.dropped_list_of_store_addresses, 0)
+        page.wait_scroll_and_click_on_element(page.inner_choose_store_button)
+        # НУЖНО прописать адекватную функцию загрузки страницы
+        # page.wait_page_fully_loaded
+        time.sleep(10)
+
+        # чтобы кнопка каталога и поисковое поле стали доступны:
+        selenium.set_window_size(1035, 768)
+        # клик на каталог
+        page.wait_scroll_and_click_on_element(page.catalog)
+        # клик на категорию и добавление товара в корзину
+        catalog = CatalogPage(selenium)
+        page.wait_scroll_and_click_on_element(catalog.meat_category)
+        page.wait_scroll_and_click_on_one_of_elements(page.add_to_basket_button, 0)
+        page.wait_scroll_and_click_on_element(page.catalog)
+        page.wait_scroll_and_click_on_element(catalog.fruits_and_veg_category)
+        page.wait_scroll_and_click_on_one_of_elements(page.add_to_basket_button, 1)
+        page.wait_scroll_and_click_on_element(page.catalog)
+        page.wait_scroll_and_click_on_element(catalog.for_pets_category)
+
+        product = ProductPage(selenium)
+        page.wait_scroll_and_click_on_one_of_elements(page.product_card, 0)
+        page.wait_scroll_to_center_and_click_on_element(product.add_to_busket_from_product_page_button)
+        page.wait_scroll_and_click_on_element(page.catalog)
+        page.wait_scroll_and_click_on_element(catalog.for_home_category)
+        page.wait_scroll_and_click_on_one_of_elements(page.product_card, 3)
+        page.wait_scroll_to_center_and_click_on_element(product.add_to_busket_from_product_page_button)
+
+        # обращение к поисковому полю, ввод и нажатие кнопки поиск
+        for product in ['орехи', 'ананас', 'яйца']:
+            page.wait_scroll_and_click_on_element(page.search_field)
+            page.clear_and_enter_text(page.search_field, product)
+            page.wait_scroll_and_click_on_element(page.search_icon_button)
+            page.wait_scroll_and_click_on_one_of_elements(page.add_to_basket_button, 3)
+            time.sleep(3)
+
+        page.wait_scroll_and_click_on_element(page.cart_icon)
+        time.sleep(20)
+
+        assert len(selenium.find_elements(*page.content_of_basket)) == 7, \
+            "Количество добавленных позиций не соответствует количеству позиций в корзине"
+

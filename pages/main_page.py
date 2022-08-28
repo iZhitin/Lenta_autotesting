@@ -24,7 +24,16 @@ class MainPage(BasePage):
         # локаторы одинаковые (вроде)
         self.store_window = (By.CSS_SELECTOR, '.modal__content-container')
         self.delivery_window = (By.CSS_SELECTOR, '.modal__content-container')
-
+        self.inner_address_input_field = (By.CSS_SELECTOR, 'input.input-field__control.input-field__control--native')
+        # self.address_confirmation_button = (By.CSS_SELECTOR, '.buttons-control.buttons-control--with-map')
+        self.address_confirmation_button = (By.CSS_SELECTOR, '.button.button--primary.button--small.buttons-control__button.delivery-flow__submit')
+        self.inner_show_addresses_by_list_button = (By.CSS_SELECTOR, '.button.button--primary.button--small.buttons-control__button.stores-flow__button')
+        self.address = (By.CSS_SELECTOR, ".address-container__adress-location")
+        self.inner_store_button = (By.XPATH, '//*[text()="Магазины / Самовывоз"]')
+        self.inner_delivery_button = (By.XPATH, '//*[text()="Доставка"]')
+        # '.button.button--primary.button--small.buttons-control__button.stores-flow__button')
+        self.dropped_list_of_store_addresses = (By.CSS_SELECTOR, '.stores-list-item__name')
+        self.inner_choose_store_button = (By.CSS_SELECTOR, '.button.button--primary.button--small.buttons-control__button.store-view__button')
         self.delivery = (By.XPATH, "//*[@class='header-switcher__label' and text()='Доставка']")
         self.catalog = (By.CSS_SELECTOR, '[href="/catalog/"]')
         self.header_logo = (By.CSS_SELECTOR, '.header__logo')
@@ -78,11 +87,15 @@ class MainPage(BasePage):
 
 
         # этот локатор не только в этом классе
-        self.add_to_busket_button = (By.CSS_SELECTOR, '.sku-card-small-basket-control__default-control')
+        self.add_to_basket_button = (By.CSS_SELECTOR, '.sku-card-small-basket-control__default-control')
+
+        self.product_card = (By.CSS_SELECTOR, '.sku-card-small-container')
 
         # этот локатор не только в этом классе
         self.amount_of_goods = (By.CSS_SELECTOR, ".header-catalog-link__counter.js-sku-counter-basket.header-catalog-link__counter--show")
 
+
+        self.content_of_basket = (By.CSS_SELECTOR, '.sku-card-in-basket')
 
 # '.footer__main-nav.main-nav .main-nav__item-select')
 # footer__main-nav main-nav

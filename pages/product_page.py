@@ -23,3 +23,4 @@ class ProductPage(BasePage):
         # при наведении курсора на изображение, его тег меняется - из класса уходит image-zoom--hidden
         self.image_magnifying = (By.XPATH,
                                  '//*[@class="sku-page__image-container sku-images-slider__image-wrapper square image-zoom sku-images-slider__image-show-only"]')
+        self.add_to_busket_from_product_page_button = (By.CSS_SELECTOR, '.basket-sku-control.sku-page-control__basket-control')
