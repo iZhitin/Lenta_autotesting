@@ -9,12 +9,20 @@
 # This is example shows how we can manage failed tests
 # and make screenshots after any failed test case.
 
-# для тестирования
-import pytest
-# для репортирования результатов
-import allure
 # для присвоения id
 import uuid
+
+# для репортирования результатов
+import allure
+# для тестирования
+import pytest
+
+# from selenium import webdriver
+# @pytest.fixture(scope='session')
+# def browser():
+#     selenium = webdriver.Chrome('/chromedriver.exe')
+#     yield selenium
+#     selenium.quit()
 
 
 # параметры браузера во время теста

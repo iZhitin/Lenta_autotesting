@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+rm -rf .pytest_cache
 rm -rf .cache
 rm -rf .idea
 rm -rf *.log

@@ -1,19 +1,20 @@
+/__pycache__
 __pycache__
 *__pycache__*
+__py*
+
 .idea
 *.idea*
-*.pyc
-
-*.pyc
-__py*
-.cache/
 .idea/
-testdev/
-
-/__pycache__
 /.idea
-/.pytets_cache
-/venv
 
-tests/__pycache__/
+*.pyc
+
+.cache/
+/.pytets_cache
+
+/venv
+/other
+
+
 

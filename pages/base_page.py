@@ -1,38 +1,22 @@
-# для парсинга параметров пути
-import time
-from urllib.parse import urlparse
-# для явного ожидания
-from pyvirtualdisplay import Display
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-# для выполнения действий
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.keys import Keys
-# для работы с json
-import json
-# для генерации id
-import uuid
 # для работы с cookie
 import pickle
+# для неявного ожидания
+import time
+# для генерации id
+import uuid
+# для работы с url
+from urllib.parse import urlparse
 
-# для удобной работы с локаторами импортируем метод By
-from selenium.webdriver.common.by import By
+# для выполнения действий и явного ожидания
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-# для изменения разрешения дисплея
-# from pyvirtualdisplay import Display
-# для нажатия клавиш
-# from pynput.keyboard import Key, Controller
 
-# класс основной страницы
 class BasePage(object):
-    """Класс, предоставляющий общий функционал, для работы со страницей. Но не с
-    элементами страницы"""
+    """Класс, содержащий в себе весь функционал фреймворка по работе со страницами и их элементами."""
 
-    # конструктор класса - специальный метод с ключевым словом __init__ (по факту, конструктор __new__,
-    # а это - инициализатор нового объекта класса)
-
-    # при создании экземпляра класса в него передаются
-    # объект веб-драйвера, адрес страницы и время ожидания элементов
     def __init__(self, driver, url='', timeout=10):
         self.driver = driver
         if not url:
@@ -45,112 +29,27 @@ class BasePage(object):
         url = urlparse(self.driver.current_url)
         return url.path
 
+    # сохранение cookie
+    def save_cookies(self):
+        with open("my_cookies.txt", "wb") as cookies:
+            pickle.dump(self.driver.get_cookies(), cookies)
+
+    # чтение cookie
+    def read_cookies(self):
+        with open("my_cookies.txt", "rb") as cookiesfile:
+            cookies = pickle.load(cookiesfile)
+            for cookie in cookies:
+                self.driver.add_cookie(cookie)
+
     # сохранение скриншота
     def take_screenshot(self):
         # чтобы заработало, нужна предварительно созданная папка screenshots в корне проекта
         screenshot = 'screenshots/{0}.png'
         self.driver.save_screenshot(screenshot.format(str(uuid.uuid4().hex)))
 
-    # прокрутка до элемента, ожидание видимости, движение мыши к центру элемента и клик
-    def wait_scroll_and_click_on_element(self, locator):
-        # локатор в формате (By.LOCATOR, 'locator')
-        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
-        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
-        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
-        # наведение мыши на центр элемента и клик
-        ActionChains(self.driver).move_to_element(web_element).click(web_element).perform()
-
-
-    # прокрутка до ОДНОГО ИЗ элементов, ожидание видимости, движение мыши к центру элемента и клик
-    # нумерация с нуля
-    def wait_to_be_clickable_of_one_of_elements(self, locator, index):
-        # локатор в формате (By.LOCATOR, 'locator')
-        # можно МЕНЯТЬ с any на all
-        try:
-            web_elements = WebDriverWait(self.driver, 10).until(EC.visibility_of_any_elements_located(locator))
-            web_elements[index].click()
-            return True
-        except:
-            return False
-
-    # НЕ РАБОТАЕТ
-    def wait_page_fully_loaded(self):
-        # html_before = self.driver.page_source
-        # WebDriverWait(self.driver, 10).until
-        WebDriverWait(self.driver, 60).until(self.driver.execute_script("return document.readyState == 'complete';"))
-
-
-    # прокрутка до элемента, ожидание видимости и получение текста тега
-    def wait_scroll_and_get_text_of_element(self, locator):
-        # локатор в формате (By.LOCATOR, 'locator')
-        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
-        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
-        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
-        # наведение мыши на центр элемента и клик
-        return web_element.text
-
-    # ожидание видимости, прокрутка до элемента в середине экрана, движение мыши к центру элемента и клик
-    def wait_scroll_to_center_and_click_on_element(self, locator):
-        # локатор в формате (By.LOCATOR, 'locator')
-        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
-        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
-        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
-        # наведение мыши на центр элемента и клик
-        ActionChains(self.driver)\
-            .send_keys(Keys.ARROW_UP)\
-            .send_keys(Keys.ARROW_UP)\
-            .send_keys(Keys.ARROW_UP)\
-            .send_keys(Keys.ARROW_UP)\
-            .send_keys(Keys.ARROW_UP)\
-            .move_to_element(web_element).click(web_element).perform()
-
     # прокрутка в самый низ, чтобы прогрузить страницу
     def scroll_to_page_bottom(self):
         self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
-
-    # прокрутка до элемента, ожидание видимости, движение мыши к центру элемента и клик
-    def wait_and_scroll_to_element(self, locator):
-        # локатор в формате (By.LOCATOR, 'locator')
-        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
-        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
-        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
-        # наведение мыши на центр элемента и клик
-        ActionChains(self.driver).move_to_element(web_element).perform()
-
-
-    # прокрутка до ОДНОГО ИЗ элементов, ожидание видимости, движение мыши к центру элемента и клик
-    # нумерация с нуля
-    def wait_scroll_and_click_on_one_of_elements(self, locator, index):
-        # локатор в формате (By.LOCATOR, 'locator')
-        # можно МЕНЯТЬ с any на all
-        web_elements = WebDriverWait(self.driver, 20).until(EC.visibility_of_any_elements_located(locator))
-        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
-        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_elements[index])
-        # добавим нажатие кнопки "вверх" из-за того, что нужный элемент все время прячется
-        # (выравнивание по верхней или нижней границе)
-        ActionChains(self.driver)\
-            .send_keys(Keys.ARROW_UP)\
-            .send_keys(Keys.ARROW_UP)\
-            .send_keys(Keys.ARROW_UP)\
-            .move_to_element(web_elements[index])\
-            .click(web_elements[index]).perform() # наведение мыши на центр элемента и клик
-        # клик СРАБОТАЕТ, если передать в аргумент ЭЛЕМЕНТ !!!
-
-    # ожидание видимости, движение мыши к центру элемента и клик
-    def wait_and_click_on_one_of_elements(self, locator, index):
-        # локатор в формате (By.LOCATOR, 'locator')
-        # можно менять с any на all
-        web_elements = WebDriverWait(self.driver, 20).until(EC.visibility_of_any_elements_located(locator))
-        ActionChains(self.driver).move_to_element(web_elements[index]).click(web_elements[index]).perform()
-
-    # возвращение на предыдущую страницу
-    def go_back(self):
-        # встроенный метод selenium .back() - назад ( .forward() - вперед) - не всегда стабилен
-        # поменял местами
-        try:
-            self.driver.execute_script("window.history.go(-1)")
-        except:
-            self.driver.back()
 
     # задать масштаб страницы
     def zoom(self, value):
@@ -158,48 +57,14 @@ class BasePage(object):
         # после перезагрузки страницы масштаб возвращается к 100%
         self.driver.execute_script("document.body.style.zoom='{0}%'".format(value))
 
-    # реальное (а не видимое) переключение на страницу по ее номеру
-    def switch_tab(self, tab):
-        # нумерация закладок с 0
-        self.driver.switch_to.window(self.driver.window_handles[tab])
-
-    # ввод текста в текстовое поле
-    def clear_and_enter_text(self, locator, text):
-        # локатор в формате (By.LOCATOR, 'locator')
-        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
-        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
-        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
-        ActionChains(self.driver).move_to_element(web_element).double_click()\
-            .click_and_hold()\
-            .send_keys(Keys.CLEAR)\
-            .send_keys(text).perform()
-
-    # ввод текста и нажатие кнопки enter ???
-    def enter_text_and_press_return(self, locator, text):
-        # локатор в формате (By.LOCATOR, 'locator')
-        web_element = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located(locator))
-        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
-        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
-        # ДЛЯ имитации ввода ни одна из следующих команд - не работает
-        # в поисковом поле (внешнем и внутреннем) на сайте Лента
-        # web_element.submit()
-        # .send_keys(text\n)
-        # .send_keys(u'\ue007')
-        # .send_keys('\ue007')
-        # .send_keys(Keys.ENTER)
-        # .send_keys(Keys.RETURN)
-        ActionChains(self.driver).move_to_element(web_element).send_keys(text).send_keys(Keys.ENTER).perform()
-
-        # для изменения разрешения дисплея
-        # from pyvirtualdisplay import Display
-        # display = Display(size=(800, 600))
-        # display.start()
-
-        # для нажатия клавиш
-        # from pynput.keyboard import Key, Controller
-        # keyboard = Controller()
-        # keyboard.press(Key.enter)
-        # keyboard.release(Key.enter)
+    # возвращение на предыдущую страницу
+    def go_back(self):
+        # встроенный метод selenium .back() - назад ( .forward() - вперед) - не всегда стабилен
+        # поменять местами
+        try:
+            self.driver.execute_script("window.history.go(-1)")
+        except:
+            self.driver.back()
 
     # поиск элемента на странице
     def seek_element(self, locator, timeout=10):
@@ -220,31 +85,13 @@ class BasePage(object):
         # немного не поддается пониманию, но работает
         return element is not None
 
-    def presence(self, locator):
-        # локатор в формате (By.LOCATOR, 'locator')
-        web_element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(locator))
+    # реальное (а не видимое) переключение на страницу по ее номеру
+    def switch_tab(self, tab):
+        # нумерация закладок с 0
+        self.driver.switch_to.window(self.driver.window_handles[tab])
 
-        def wait_presence(self, locator):
-            # локатор в формате (By.LOCATOR, 'locator')
-            web_element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(locator))
-            web_element.click()
-            return web_element
-
-    # сохранение cookie
-    def save_cookies(self):
-        with open("my_cookies.txt", "wb") as cookies:
-            pickle.dump(self.driver.get_cookies(), cookies)
-
-    # чтение cookie
-    def read_cookies(self):
-        with open("my_cookies.txt", "rb") as cookiesfile:
-            cookies = pickle.load(cookiesfile)
-            for cookie in cookies:
-                self.driver.add_cookie(cookie)
-
-    # ??? надо проверять на реальном объекте
-    # прокрутка снизу к верху, пока элемент не будет виден
-    def scroll_from_down_to_up(self, locator):
+    # прокрутка снизу к верху, пока элемент не будет виден ???
+    def scroll_from_down_to_up_until_visibility_of_element(self, locator):
         self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
         while True:
             ActionChains(self.driver).send_keys(Keys.UP).perform()
@@ -252,51 +99,166 @@ class BasePage(object):
             if EC.visibility_of_any_elements_located(locator):
                 break
 
-
-
-
-
-
-# class ManyWebElements(WebElement):
-#
-#     def __getitem__(self, item):
-#         """ Get list of elements and try to return required element. """
-#
-#         elements = self.find()
-#         return elements[item]
-#
-#     def find(self, timeout=10):
-#         """ Find elements on the page. """
-#
-#         elements = []
-#
-#         try:
-#             elements = WebDriverWait(self._web_driver, timeout).until(
-#                EC.presence_of_all_elements_located(self._locator)
-#             )
-#         except:
-#             print(colored('Elements not found on the page!', 'red'))
-#
-#         return elements
-
-
-    # для работы с невидимым элементом
-    def wait_for_animation(self, selector):
-        """
-        Waits until jQuery animations have finished for the given jQuery  selector.
-        """
-        WebDriverWait(self.driver, 10).until(lambda driver: driver.execute_script(
-            "return jQuery(%s).is(':animated')" % json.dumps(selector)) == False)
-
-    def wait_for_ajax_loading(self, class_name):
-        """
-        Waits until the ajax loading indicator disappears.
-        """
-        WebDriverWait(self.driver, 10).until(lambda driver: len(driver.find_elements_by_class_name(
-            class_name)) == 0)
-
-    def wait_presence(self, locator):
+    # очистка и ввод текста в текстовое поле
+    def clear_and_enter_text(self, locator, text, timeout=20):
         # локатор в формате (By.LOCATOR, 'locator')
-        web_element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(locator))
-        web_element.click()
-        return web_element
+        web_element = WebDriverWait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        ActionChains(self.driver).move_to_element(web_element).double_click()\
+            .click_and_hold()\
+            .send_keys(Keys.CLEAR)\
+            .send_keys(text).perform()
+
+    # очистка, ввод текста в текстовое поле и нажатие кнопки enter
+    def clear_enter_text_and_press_return(self, locator, text, timeout=20):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        ActionChains(self.driver).move_to_element(web_element).double_click()\
+            .click_and_hold()\
+            .send_keys(Keys.CLEAR)\
+            .send_keys(text)\
+            .send_keys(Keys.ENTER).perform()
+
+                # для имитации ввода ни одна из следующих команд - не работает
+        # в поисковом поле (внешнем и внутреннем) на сайте Лента
+        # web_element.submit()
+        # .send_keys(text\n)
+        # .send_keys(u'\ue007')
+        # .send_keys('\ue007')
+        # .send_keys(Keys.ENTER)
+        # .send_keys(Keys.RETURN)
+        #
+        # для изменения разрешения дисплея
+        # from pyvirtualdisplay import Display
+        # display = Display(size=(800, 600))
+        # display.start()
+        #
+        # для нажатия клавиш
+        # from pynput.keyboard import Key, Controller
+        # keyboard = Controller()
+        # keyboard.press(Key.enter)
+        # keyboard.release(Key.enter)
+
+    # нерабочая функция полной загрузки сайта
+    # def wait_page_fully_loaded(self):
+    #     # html_before = self.driver.page_source
+    #     # WebDriverWait(self.driver, 10).until
+    #     WebDriverWait(self.driver, 60).until(self.driver.execute_script("return document.readyState == 'complete';"))
+
+    # ожидание видимости элемента, прокрутка и движение мыши к его центру
+    def wait_and_scroll_to_element(self, locator, timeout=20):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        # наведение мыши на центр элемента
+        ActionChains(self.driver).move_to_element(web_element).perform()
+
+    # ожидание видимости элемента, прокрутка, движение мыши к его центру и клик
+    def wait_scroll_and_click_on_element(self, locator, timeout=20):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        # наведение мыши на центр элемента и клик
+        ActionChains(self.driver).move_to_element(web_element).click(web_element).perform()
+
+    # ожидание видимости элемента, прокрутка до него в середине экрана, движение мыши к его центру и клик
+    def wait_scroll_to_center_and_click_on_element(self, locator, timeout=20):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver,timeout).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        # наведение мыши на центр элемента и клик
+        # нужно нажать вверх, так как после js-скрипта элемент еще не виден, чтобы продвинуть элемент к центру экрана
+        ActionChains(self.driver)\
+            .send_keys(Keys.ARROW_UP)\
+            .send_keys(Keys.ARROW_UP)\
+            .send_keys(Keys.ARROW_UP)\
+            .send_keys(Keys.ARROW_UP)\
+            .send_keys(Keys.ARROW_UP)\
+            .move_to_element(web_element).click(web_element).perform()
+
+    # ожидание видимости элемента, прокрутка до него и получение текста из его тега
+    def wait_scroll_and_get_text_from_element(self, locator, timeout=20):
+        # локатор в формате (By.LOCATOR, 'locator')
+        web_element = WebDriverWait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_element)
+        # возвращение внутреннего текста веб элемента
+        return web_element.text
+
+    # ожидание видимости, движение мыши к центру ОДНОГО ИЗ элементов и клик
+    def wait_and_click_on_one_of_elements(self, locator, index, timeout=20):
+        # локатор в формате (By.LOCATOR, 'locator')
+        # можно МЕНЯТЬ с any на all
+        web_elements = WebDriverWait(self.driver, timeout).until(EC.visibility_of_any_elements_located(locator))
+        ActionChains(self.driver).move_to_element(web_elements[index]).click(web_elements[index]).perform()
+
+    # ожидание видимости, прокрутка до ОДНОГО ИЗ элементов, движение мыши к центру и клик
+    def wait_scroll_and_click_on_one_of_elements(self, locator, index, timeout=20):
+        # локатор в формате (By.LOCATOR, 'locator')
+        # можно МЕНЯТЬ с any на all
+        web_elements = WebDriverWait(self.driver, timeout).until(EC.visibility_of_any_elements_located(locator))
+        # ПРОКРУТКА К ЭЛЕМЕНТУ В JS работает отлично, что не скажешь о прокрутке Selenium
+        self.driver.execute_script("return arguments[0].scrollIntoView(true);", web_elements[index])
+        # добавим нажатие кнопки "вверх" из-за того, что нужный элемент все время прячется
+        # (выравнивание по верхней или нижней границе)
+        ActionChains(self.driver)\
+            .send_keys(Keys.ARROW_UP)\
+            .send_keys(Keys.ARROW_UP)\
+            .send_keys(Keys.ARROW_UP)\
+            .move_to_element(web_elements[index])\
+            .click(web_elements[index]).perform()
+        # клик СРАБОТАЕТ, если передать в аргумент ЭЛЕМЕНТ !!!
+
+    # проверка кликабельности ОДНОГО ИЗ элементов ???
+    def wait_to_be_clickable_of_one_of_elements(self, locator, index, timeout=10):
+        # локатор в формате (By.LOCATOR, 'locator')
+        # можно МЕНЯТЬ с any на all
+        try:
+            web_elements = WebDriverWait(self.driver, timeout).until(EC.visibility_of_any_elements_located(locator))
+            web_elements[index].click()
+            return True
+        except:
+            return False
+
+    # не использующиеся функции
+            # для работы с невидимым элементом
+    # def wait_for_animation(self, selector):
+    #     """
+    #     Waits until jQuery animations have finished for the given jQuery  selector.
+    #     """
+    #     WebDriverWait(self.driver, 10).until(lambda driver: driver.execute_script(
+    #         "return jQuery(%s).is(':animated')" % json.dumps(selector)) == False)
+    #
+    # def wait_for_ajax_loading(self, class_name):
+    #     """
+    #     Waits until the ajax loading indicator disappears.
+    #     """
+    #     WebDriverWait(self.driver, 10).until(lambda driver: len(driver.find_elements_by_class_name(
+    #         class_name)) == 0)
+    #
+    # def wait_presence(self, locator):
+    #     # локатор в формате (By.LOCATOR, 'locator')
+    #     web_element = WebDriverWait(self.driver, 20).until(EC.presence_of_element_located(locator))
+    #     web_element.click()
+    #     return web_element
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

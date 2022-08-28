@@ -1,4 +1,4 @@
-# импортируем функционал применимый к любой странице
+# импортируем базовый класс для наследования всего основного функционала
 from pages.base_page import BasePage
 # для удобной работы с локаторами импортируем метод By
 from selenium.webdriver.common.by import By
@@ -8,19 +8,18 @@ from selenium.webdriver.common.by import By
 class CatalogPage(BasePage):
     def __init__(self, driver, timeout=10):
         self.driver = driver
-        # прибавляем к url главной страницы параметры пути ?
+        # прибавляем к url главной страницы параметры пути ???
         page = BasePage(driver)
         self.url = page.url + 'catalog/'
-        # ЕСЛИ не передать self.url в super(), то будет открываться гл. страница из BasePage
+        # ЕСЛИ не передать self.url в super(), то экземпляр.url будет гл. страницей из BasePage
         super().__init__(driver, self.url)
-
-        # локаторы элементов страницы
 
         # экранирование кавычки обратным слэшем \"
         # вместо записи By.CSS_SELECTOR используем 'css selector', так как в словаре не получается реализовать By
         # self.categories = {
         # 'meat_category' : "('css selector', 'a[href=\"/catalog/myaso-ptica-kolbasa/\"]')"
         # } # и даже так реализация словаря не работает
+
         # 'fruits_and_veg_category' = (By.CSS_SELECTOR, 'a[href="/catalog/frukty-i-ovoshchi/"]')
         # 'bakery_category' = (By.CSS_SELECTOR, 'a[href="/catalog/konditerskie-izdeliya/"]')
         # 'hot_beverages_category' = (By.CSS_SELECTOR, 'a[href="/catalog/chajj-kofe-kakao/"]')
@@ -49,8 +48,9 @@ class CatalogPage(BasePage):
         # 'textile_category' = (By.CSS_SELECTOR, 'a[href="/catalog/tekstil-dlya-doma/"]')
         # 'flowers_category' = (By.CSS_SELECTOR, 'a[href="/catalog/cvety/"]')
         # 'tobacco_category' = (By.CSS_SELECTOR, 'a[href="/catalog/tabachnaya-produkciya/"]')
-        # }
 
+        # локаторы элементов страницы
+        # категории товаров из каталога
         self.meat_category = (By.CSS_SELECTOR, 'a[href="/catalog/myaso-ptica-kolbasa/"]')
         self.fruits_and_veg_category = (By.CSS_SELECTOR, 'a[href="/catalog/frukty-i-ovoshchi/"]')
         self.bakery_category = (By.CSS_SELECTOR, 'a[href="/catalog/konditerskie-izdeliya/"]')
@@ -81,20 +81,17 @@ class CatalogPage(BasePage):
         self.flowers_category = (By.CSS_SELECTOR, 'a[href="/catalog/cvety/"]')
         self.tobacco_category = (By.CSS_SELECTOR, 'a[href="/catalog/tabachnaya-produkciya/"]')
 
-
-        # локаторы элементов элементов страницы
+        # кнопка добавить в корзину внутри категории товаров
         # этот локатор не только в этом классе
-        self.add_to_busket_button = (By.CSS_SELECTOR, '.sku-card-small-basket-control__default-control')
-        # self.add_to_busket_button = (By.CSS_SELECTOR, '.sku-card-small-basket-control__default-control')
-        # self.add_to_busket_button = (By.XPATH, '//*[text()="В корзину"]')
-        # self.add_to_busket_button = (By.CSS_SELECTOR, '.sku-card-small-basket-control.sku-card-small__control')
+        self.add_to_basket_button = (By.CSS_SELECTOR, '.sku-card-small-basket-control__default-control')
 
         # этот локатор не только в этом классе
         self.cookie_agree_button = (By.XPATH, '//*[text()="Согласен"]')
 
         # количество (цифра у корзины) добавленных товаров
         # этот локатор не только в этом классе
-        self.amount_of_goods = (By.CSS_SELECTOR, ".header-catalog-link__counter.js-sku-counter-basket.header-catalog-link__counter--show")
+        self.amount_of_goods = (By.CSS_SELECTOR,
+                                ".header-catalog-link__counter.js-sku-counter-basket.header-catalog-link__counter--show")
 
 
 
